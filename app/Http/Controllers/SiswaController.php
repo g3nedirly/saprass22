@@ -1,82 +1,103 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class SiswaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar siswa.
      */
     public function index()
     {
         $siswas = Siswa::all();
         return view('admin.siswa.dashboard', compact('siswas'));
     }
-    
-    
 
     /**
-     * Show the form for creating a new resource.
+     * Simpan data siswa ke dalam database.
      */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        // Validasi data dengan aturan yang lebih ketat
+        $validatedData = $request->validate([
+            'nama' => 'required|string|max:255',
+            'status' => 'required|string|max:50',
+            'tanggal_masuk' => 'required|date',
+            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
+        ]);
+
+        // Simpan data ke database
+        Siswa::create($validatedData);
+
+        // Redirect ke halaman index dengan pesan sukses
+        return redirect()->route('siswa.index')->with('success', 'Data berhasil disimpan!');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Reset dan simpan ulang data siswa.
      */
-    /**
- * Simpan data siswa ke dalam database.
- */
-public function store(Request $request)
-{
-    $request->validate([
-        'nama' => 'required',
-        'status' => 'required',
-        'tanggal_masuk' => 'required|date',
-        'tanggal_keluar' => 'nullable|date',
-    ]);
-
-    $siswa = Siswa::create($request->all());
-
-    return response()->json(['success' => 'Data berhasil disimpan!', 'siswa' => $siswa]);
-}
-
-/**
- * Ambil semua data siswa dalam format JSON.
- */
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function resetStore(Request $request)
     {
-        //
+        // Validasi data
+        $request->validate([
+            'siswas' => 'required|array',
+            'siswas.*.nama' => 'required|string|max:255',
+            'siswas.*.status' => 'required|string|max:50',
+            'siswas.*.tanggal_masuk' => 'required|date',
+            'siswas.*.tanggal_keluar' => 'nullable|date|after_or_equal:siswas.*.tanggal_masuk',
+        ]);
+
+        // Hapus semua data siswa
+        Siswa::truncate();
+
+        // Simpan data baru
+        foreach ($request->siswas as $data) {
+            Siswa::create([
+                'nama' => $data['nama'],
+                'status' => $data['status'],
+                'tanggal_masuk' => $data['tanggal_masuk'],
+                'tanggal_keluar' => $data['tanggal_keluar'] ?? null,
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Update data siswa berdasarkan ID.
      */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'status' => 'required|string|max:50',
+            'tanggal_masuk' => 'required|date',
+            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
+        ]);
+
+        $siswa = Siswa::findOrFail($id);
+        $siswa->update([
+            'nama' => $request->nama,
+            'status' => $request->status,
+            'tanggal_masuk' => $request->tanggal_masuk,
+            'tanggal_keluar' => $request->tanggal_keluar,
+        ]);
+
+        return response()->json(['success' => true, 'siswa' => $siswa]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Hapus data siswa berdasarkan ID.
      */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $siswa = Siswa::findOrFail($id);
+        $siswa->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json(['success' => true]);
     }
 }

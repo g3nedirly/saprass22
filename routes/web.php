@@ -10,7 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 
-// Route untuk halaman welcome
+// Route untuk halaman utama
 Route::get('/', function () {
     return view('welcome');
 });
@@ -26,10 +26,6 @@ Route::post('/user/login', [AuthController::class, 'userLogin']);
 // Route untuk logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rute CRUD Data Siswa
-    Route::resource('siswa', SiswaController::class);
-    Route::post('/siswa/store', [SiswaController::class, 'store'])->name('siswa.store'); // Simpan Data Siswa
-    Route::get('/siswa/get', [SiswaController::class, 'getSiswa'])->name('siswa.get');   // Ambil Data Siswa
 
 // Route untuk admin (hanya bisa diakses oleh admin)
 Route::middleware('admin')->group(function () {
@@ -38,18 +34,15 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/petugas/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/siswa/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/arsip/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/arsip/create', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-    // Rute CRUD Data Siswa
-    Route::resource('siswa', SiswaController::class);
-    Route::post('/siswa/store', [SiswaController::class, 'store'])->name('siswa.store'); // Simpan Data Siswa
-    Route::get('/siswa/get', [SiswaController::class, 'getSiswa'])->name('siswa.get');   // Ambil Data Siswa
-
     Route::resource('akun', AkunController::class);
     Route::resource('fasilitas', FasilitasController::class);
     Route::resource('petugas', PetugasController::class);
-    Route::resource('siswa', SiswaController::class);
+     // Siswa routes
+     Route::resource('siswa', SiswaController::class);
+
     Route::resource('arsip', ArsipController::class);
+    Route::resource('siswa', SiswaController::class);
+
 });
 
 // Route untuk user (hanya bisa diakses oleh user)

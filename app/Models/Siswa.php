@@ -9,6 +9,14 @@ class Siswa extends Model
 {
     use HasFactory;
 
-    // Jika nama tabel bukan 'siswas', tentukan nama tabel secara manual
-    protected $table = 'siswa'; // Ganti dengan nama tabel yang sesuai
+    // Menentukan tabel jika tidak sesuai dengan konvensi Laravel
+    protected $table = 'siswa'; // Sesuaikan dengan nama tabel yang benar di database
+
+    // Izinkan mass assignment untuk field berikut
+    protected $fillable = [
+        'nama',
+        'status',
+        'tanggal_masuk',
+        'tanggal_keluar',
+    ];
 }

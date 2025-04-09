@@ -17,7 +17,8 @@
                 </select> entries
             </label>
         </div>
-        <input type="text" class="form-control w-auto" placeholder="Search...">
+        <input type="text" id="searchInput" class="form-control w-auto" placeholder="Search...">
+
     </div>
     <table class="table table-bordered">
         <thead>
@@ -30,59 +31,31 @@
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>rika</td>
-                <td>siswa</td>
-                <td>12-06-2022</td>
-                <td>28-04-2025</td>
+        <tbody id="siswaTableBody">
+            @foreach($siswas as $siswa)
+            <tr id="row_{{ $siswa->id }}">
+                <td>{{ $siswa->id }}</td>
+                <td>{{ $siswa->nama }}</td>
+                <td>{{ $siswa->status }}</td>
+                <td>{{ $siswa->tanggal_masuk }}</td>
+                <td>{{ $siswa->tanggal_keluar ?? '-' }}</td>
                 <td>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_2">✏️</button>
-                <button type="button" class="btn btn-danger">🗑️</button>
-                <div class="modal bg-body fade" tabindex="-1" id="kt_modal_2">
-                    <div class="modal-dialog modal-fullscreen">
-                        <div class="modal-content shadow-none">
-                        <div class="modal-header" style="background-color: #0d47a1; color: white;"> <!-- Menggunakan warna custom -->
-                                <h5 class="modal-title">SARANA PRASARANA</h5>
-                            </div>
+                <button 
+    class="btn btn-primary edit-btn" 
+    data-id="{{ $siswa->id }}" 
+    data-nama="{{ $siswa->nama }}" 
+    data-status="{{ $siswa->status }}" 
+    data-tanggal-masuk="{{ $siswa->tanggal_masuk }}" 
+    data-tanggal-keluar="{{ $siswa->tanggal_keluar }}" 
+    data-bs-toggle="modal" 
+    data-bs-target="#editStudentModal">✏️</button>
 
-                            <div class="modal-body">
-                                <div class="container mt-4">
-                                    <h3>Mengedit Data Siswa</h3>
-                                    <form>
-                                        <div class="mb-3">
-                                            <label class="form-label">Nama</label>
-                                            <input type="text" class="form-control" v-model="siswa.nama" required />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Status</label>
-                                            <input type="text" class="form-control" v-model="siswa.status" required />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tanggal Masuk</label>
-                                            <input type="date" class="form-control" v-model="siswa.tanggal_masuk" required />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tanggal Keluar</label>
-                                            <input type="date" class="form-control" v-model="siswa.tanggal_keluar" />
-                                        </div>
-                                        <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-primary">Simpan</button> <!-- Perbaiki button simpan -->
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>              
+                    <button class="btn btn-danger delete-btn" data-id="{{ $siswa->id }}">🗑️</button>
                 </td>
             </tr>
+            @endforeach
         </tbody>
-    </table>
-</div>
-
+       
 <!-- Modal Tambah Data Siswa -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen"> <!-- Menggunakan modal-fullscreen untuk tampilan penuh -->
@@ -92,7 +65,7 @@
                 
             </div>
             <div class="modal-body">
-                <form action="{{ route('siswa.store') }}" method="POST">
+            <form id="addStudentForm" action="{{ route('siswa.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Nama</label>
@@ -119,5 +92,218 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Edit Data Siswa -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Edit Data Siswa</h5>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm">
+                    @csrf
+                    <input type="hidden" id="editId">
+                    <div class="mb-3">
+                        <label class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="editNama" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <input type="text" class="form-control" id="editStatus" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Masuk</label>
+                        <input type="date" class="form-control" id="editTanggalMasuk" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Keluar</label>
+                        <input type="date" class="form-control" id="editTanggalKeluar" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery harus dimuat dulu -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<!-- AJAX Script -->
+<script >
+
+    
+    $(document).ready(function () {
+
+        // 🟢 Tambah Data Siswa
+        $('#addStudentForm').submit(function (e) {
+            e.preventDefault();
+            let formData = $(this).serialize();
+
+            $.ajax({
+                url: "{{ route('siswa.store') }}",
+                method: "POST",
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        let siswa = response.siswa;
+                        let row = `
+                            <tr id="row_${siswa.id}">
+                                <td>${siswa.id}</td>
+                                <td>${siswa.nama}</td>
+                                <td>${siswa.status}</td>
+                                <td>${siswa.tanggal_masuk}</td>
+                                <td>${siswa.tanggal_keluar ?? '-'}</td>
+                                <td>
+                                    <button class="btn btn-primary edit-btn" data-id="${siswa.id}" data-nama="${siswa.nama}" data-status="${siswa.status}" data-tanggal-masuk="${siswa.tanggal_masuk}" data-tanggal-keluar="${siswa.tanggal_keluar}" data-bs-toggle="modal" data-bs-target="#editStudentModal">✏️</button>
+                                    <button class="btn btn-danger delete-btn" data-id="${siswa.id}">🗑️</button>
+                                </td>
+                            </tr>
+                        `;
+                        $('#siswaTableBody').append(row);
+                        $('#addStudentModal').modal('hide');
+                        $('#addStudentForm')[0].reset();
+                        alert("Data siswa berhasil ditambahkan!");
+                    } else {
+                        alert("Terjadi kesalahan saat menambahkan data.");
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseText);
+                }
+            });
+        });
+
+    // 🖊️ Event untuk tombol Edit
+    $(document).on('click', '.edit-btn', function () {
+        let id = $(this).data('id');
+        let nama = $(this).data('nama');
+        let status = $(this).data('status');
+        let tanggalMasuk = $(this).data('tanggal-masuk');
+        let tanggalKeluar = $(this).data('tanggal-keluar');
+
+        // Isi form dalam modal
+        $('#editId').val(id);
+        $('#editNama').val(nama);
+        $('#editStatus').val(status);
+        $('#editTanggalMasuk').val(tanggalMasuk);
+        $('#editTanggalKeluar').val(tanggalKeluar);
+
+        // Tampilkan modal edit
+        $('#editStudentModal').modal('show');
+    });
+
+    // 📝 Kirim Form Edit ke Server
+$('#editStudentForm').off('submit').on('submit', function (e) {
+    e.preventDefault();
+
+    let id = $('#editId').val();
+    let formData = {
+        _token: "{{ csrf_token() }}",
+        _method: "PUT", // Laravel menerima update dengan PUT
+        nama: $('#editNama').val(),
+        status: $('#editStatus').val(),
+        tanggal_masuk: $('#editTanggalMasuk').val(),
+        tanggal_keluar: $('#editTanggalKeluar').val()
+    };
+
+    $.ajax({
+        url: `/siswa/${id}`,
+        type: "POST", // Laravel hanya menerima POST, gunakan _method: PUT
+        data: formData,
+        success: function (response) {
+            if (response.success) {
+                let siswa = response.siswa;
+
+                // 🔄 Update tampilan tabel tanpa reload
+                let updatedRow = `
+                    <td>${siswa.id}</td>
+                    <td>${siswa.nama}</td>
+                    <td>${siswa.status}</td>
+                    <td>${siswa.tanggal_masuk}</td>
+                    <td>${siswa.tanggal_keluar ?? '-'}</td>
+                    <td>
+                        <button class="btn btn-primary edit-btn"
+                            data-id="${siswa.id}"
+                            data-nama="${siswa.nama}"
+                            data-status="${siswa.status}"
+                            data-tanggal-masuk="${siswa.tanggal_masuk}"
+                            data-tanggal-keluar="${siswa.tanggal_keluar}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editStudentModal">
+                            ✏️
+                        </button>
+                        <button class="btn btn-danger delete-btn" data-id="${siswa.id}">🗑️</button>
+                    </td>
+                `;
+
+                // Ganti isi row dengan data baru dan beri efek highlight kuning
+                $(`#row_${id}`).html(updatedRow).addClass('table-warning');
+
+                // Efek highlight hanya 2 detik
+                setTimeout(() => {
+                    $(`#row_${id}`).removeClass('table-warning');
+                }, 2000);
+
+                // Tutup modal edit
+                $('#editStudentModal').modal('hide');
+
+                alert("Data siswa berhasil diperbarui!");
+            } else {
+                alert("Gagal memperbarui data.");
+            }
+        },
+        error: function (xhr) {
+            alert("Error: " + xhr.responseText);
+        }
+    });
+});
+
+
+
+
+        // 🔴 Hapus Data Siswa
+        $(document).on('click', '.delete-btn', function () {
+            let id = $(this).data('id');
+            if (confirm("Apakah kamu yakin ingin menghapus data ini?")) {
+                $.ajax({
+                    url: `/siswa/${id}`,
+                    type: "POST", // Laravel hanya menerima POST
+                    data: {
+                        _method: "DELETE",
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $(`#row_${id}`).remove();
+                            alert("Data siswa berhasil dihapus!");
+                        } else {
+                            alert("Gagal menghapus data.");
+                        }
+                    },
+                    error: function (xhr) {
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).ready(function () {
+    $('#searchInput').on('keyup', function () {
+        let value = $(this).val().toLowerCase();
+        $('#siswaTableBody tr').filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+});
+</script>
+
+
 
 @endsection
