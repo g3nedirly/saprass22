@@ -7,19 +7,19 @@
         <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">Tambah</button>
         <button class="btn btn-success">Import Excel</button>
     </div>
-    <div class="mb-3 d-flex justify-content-between">
-        <div>
-            <label>Show
-                <select class="form-select d-inline w-auto mx-2">
-                    <option>10</option>
-                    <option>25</option>
-                    <option>50</option>
-                </select> entries
-            </label>
-        </div>
-        <input type="text" name="search" id="searchInput" class="form-control w-auto d-inline" placeholder="Cari..." value="{{ request('search') }}">
-        
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+        <label>
+            
+            <span id="shownCount">Menampilkan 0 dari {{ count($siswas) }}</span>
+        </label>
     </div>
+    <div class="d-flex align-items-center">
+        <label for="searchInput" class="me-2 mb-0">Search :</label>
+        <input type="text" name="search" id="searchInput" class="form-control w-auto" placeholder="Cari..." value="{{ request('search') }}">
+    </div>
+</div>
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -93,7 +93,7 @@
     </div>
 </div>
 
-<!-- Modal Edit Data Siswa -->
+
 <!-- Modal Edit Data Siswa -->
 <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
@@ -141,6 +141,20 @@
     
     $(document).ready(function () {
 
+         // 🔍 Fitur Pencarian dengan Update Jumlah Tampilan
+         $('#searchInput').on('keyup', function () {
+            let value = $(this).val().toLowerCase();
+            let visibleCount = 0;
+
+            $('#siswaTableBody tr').each(function () {
+                let isMatch = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggle(isMatch);
+                if (isMatch) visibleCount++;
+            });
+
+            // 🧮 Update jumlah entri yang tampil
+            $('#shownCount').text(`Menampilkan ${visibleCount} dari {{ count($siswas) }}`);
+        });
         // 🟢 Tambah Data Siswa
         $('#addStudentForm').submit(function (e) {
             e.preventDefault();
