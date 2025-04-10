@@ -21,8 +21,9 @@ class SiswaController extends Controller
      * Simpan data siswa ke dalam database.
      */
     public function store(Request $request)
-    {
-        // Validasi data dengan aturan yang lebih ketat
+{
+    try {
+        // Validasi data
         $validatedData = $request->validate([
             'nama' => 'required|string|max:255',
             'status' => 'required|string|max:50',
@@ -30,12 +31,23 @@ class SiswaController extends Controller
             'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
         ]);
 
-        // Simpan data ke database
-        Siswa::create($validatedData);
+        // Simpan data
+        $siswa = Siswa::create($validatedData);
 
-        // Redirect ke halaman index dengan pesan sukses
-        return redirect()->route('siswa.index')->with('success', 'Data berhasil disimpan!');
+        // Response sukses
+        return response()->json([
+            'success' => true,
+            'siswa' => $siswa
+        ]);
+    } catch (\Exception $e) {
+        // Tangani error (bisa tambah log juga)
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * Reset dan simpan ulang data siswa.

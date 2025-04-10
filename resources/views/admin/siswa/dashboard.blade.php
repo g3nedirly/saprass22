@@ -17,8 +17,8 @@
                 </select> entries
             </label>
         </div>
-        <input type="text" id="searchInput" class="form-control w-auto" placeholder="Search...">
-
+        <input type="text" name="search" id="searchInput" class="form-control w-auto d-inline" placeholder="Cari..." value="{{ request('search') }}">
+        
     </div>
     <table class="table table-bordered">
         <thead>
@@ -34,12 +34,12 @@
         <tbody id="siswaTableBody">
             @foreach($siswas as $siswa)
             <tr id="row_{{ $siswa->id }}">
-                <td>{{ $siswa->id }}</td>
-                <td>{{ $siswa->nama }}</td>
-                <td>{{ $siswa->status }}</td>
-                <td>{{ $siswa->tanggal_masuk }}</td>
-                <td>{{ $siswa->tanggal_keluar ?? '-' }}</td>
-                <td>
+            <td>{{ $loop->iteration }}</td> <!-- Nomor urut -->
+            <td>{{ $siswa->nama }}</td>     <!-- Nama siswa -->
+            <td>{{ $siswa->status }}</td>   <!-- Status -->
+            <td>{{ $siswa->tanggal_masuk }}</td> <!-- Tanggal Masuk -->
+        <td>{{ $siswa->tanggal_keluar ?? '-' }}</td> <!-- Tanggal Keluar -->
+        <td>
                 <button 
     class="btn btn-primary edit-btn" 
     data-id="{{ $siswa->id }}" 
@@ -94,8 +94,9 @@
 </div>
 
 <!-- Modal Edit Data Siswa -->
+<!-- Modal Edit Data Siswa -->
 <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">Edit Data Siswa</h5>

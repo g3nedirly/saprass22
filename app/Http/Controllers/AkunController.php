@@ -47,7 +47,7 @@ class AkunController extends Controller
             'role' => $request->role,
         ]);
 
-        return redirect()->route('akun')->with('success', 'Akun berhasil ditambahkan');
+        return redirect()->route('akun.index')->with('success', 'Akun berhasil ditambahkan');
     }
 
     public function edit(Akun $akun)

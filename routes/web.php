@@ -41,7 +41,8 @@ Route::middleware('admin')->group(function () {
      Route::resource('siswa', SiswaController::class);
 
     Route::resource('arsip', ArsipController::class);
-    Route::resource('siswa', SiswaController::class);
+    Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
+
 
 });
 
