@@ -9,6 +9,10 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Exports\SiswaTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+
+
 
 // Route untuk halaman utama
 Route::get('/', function () {
@@ -38,10 +42,14 @@ Route::middleware('admin')->group(function () {
     Route::resource('fasilitas', FasilitasController::class);
     Route::resource('petugas', PetugasController::class);
      // Siswa routes
-     Route::resource('siswa', SiswaController::class);
+     Route::resource('siswa', SiswaController::class)->except(['show']);
 
     Route::resource('arsip', ArsipController::class);
     Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
+
+    Route::get('/siswa/template', function () {
+        return Excel::download(new SiswaTemplateExport, 'data_siswa.xlsx');
+    })->name('siswa.template');
 
 
 });

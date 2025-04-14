@@ -5,7 +5,9 @@
     <h2>Data Siswa</h2>
     <div class="mb-3">
         <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">Tambah</button>
-        <button class="btn btn-success">Import Excel</button>
+        <form action="{{ route('siswa.template') }}" method="GET" style="display: inline;">
+    <button class="btn btn-success">Download Excel</button>
+</form>
     </div>
     <div class="mb-3 d-flex justify-content-between align-items-center">
     <div>
@@ -33,8 +35,8 @@
         </thead>
         <tbody id="siswaTableBody">
             @foreach($siswas as $siswa)
-            <tr id="row_{{ $siswa->id }}">
-            <td>{{ $loop->iteration }}</td> <!-- Nomor urut -->
+            <tr id="row_{{ $loop->iteration }}">
+            <td>{{ $loop->iteration }}</td><!-- Nomor urut -->
             <td>{{ $siswa->nama }}</td>     <!-- Nama siswa -->
             <td>{{ $siswa->status }}</td>   <!-- Status -->
             <td>{{ $siswa->tanggal_masuk }}</td> <!-- Tanggal Masuk -->
@@ -42,7 +44,7 @@
         <td>
                 <button 
     class="btn btn-primary edit-btn" 
-    data-id="{{ $siswa->id }}" 
+    data-id="{{ $loop->iteration }}" 
     data-nama="{{ $siswa->nama }}" 
     data-status="{{ $siswa->status }}" 
     data-tanggal-masuk="{{ $siswa->tanggal_masuk }}" 
@@ -58,34 +60,41 @@
        
 <!-- Modal Tambah Data Siswa -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen"> <!-- Menggunakan modal-fullscreen untuk tampilan penuh -->
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #0d47a1; color: white;"> <!-- Menggunakan warna custom -->
-                <h5 class="modal-title" id="addStudentModalLabel">Tambah Data Siswa</h5>
-                
+<div class="modal-dialog modal-fullscreen">
+        <div class="modal-content" style="background-color: #d9d9d9; ">
+            
+            <!-- Modal Header -->
+            <div class="modal-header border-0">
+                <h4 class="modal-title w-100 text-center fw-bold" id="addStudentModalLabel">Tambah Data Siswa</h4>
             </div>
-            <div class="modal-body">
-            <form id="addStudentForm" action="{{ route('siswa.store') }}" method="POST">
+
+            <!-- Modal Body -->
+            <div class="modal-body px-4">
+                <form id="addStudentForm" action="{{ route('siswa.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" class="form-control" name="nama" required />
+                        <label class="form-label fw-semibold">Nama</label>
+                        <input type="text" class="form-control rounded-1" name="nama" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <input type="text" class="form-control" name="status" required />
+                        <label class="form-label fw-semibold">Status</label>
+                        <input type="text" class="form-control rounded-1" name="status" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tanggal Masuk</label>
-                        <input type="date" class="form-control" name="tanggal_masuk" required />
+                        <label class="form-label fw-semibold">Tanggal Masuk</label>
+                        <input type="date" class="form-control rounded-1" name="tanggal_masuk" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tanggal Keluar</label>
-                        <input type="date" class="form-control" name="tanggal_keluar" />
+                        <label class="form-label fw-semibold">Tanggal Keluar</label>
+                        <input type="date" class="form-control rounded-1" name="tanggal_keluar">
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+
+                    <!-- Modal Footer -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn" data-bs-dismiss="modal"
+                            style="background-color: #c2c2f0; color: black; min-width: 100px;">Batal</button>
+                        <button type="submit" class="btn"
+                            style="background-color: #0d47a1; color: white; min-width: 100px;">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -97,33 +106,40 @@
 <!-- Modal Edit Data Siswa -->
 <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Edit Data Siswa</h5>
+        <div class="modal-content" style="background-color: #d9d9d9;">
+            <!-- Modal Header -->
+            <div class="modal-header border-0">
+                <h4 class="modal-title w-100 text-center fw-bold" id="editStudentModalLabel">Edit Data Siswa</h4>
             </div>
-            <div class="modal-body">
+
+            <!-- Modal Body -->
+            <div class="modal-body px-4">
                 <form id="editStudentForm">
                     @csrf
                     <input type="hidden" id="editId">
                     <div class="mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" class="form-control" id="editNama" required />
+                        <label class="form-label fw-semibold">Nama</label>
+                        <input type="text" class="form-control rounded-1" id="editNama" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <input type="text" class="form-control" id="editStatus" required />
+                        <label class="form-label fw-semibold">Status</label>
+                        <input type="text" class="form-control rounded-1" id="editStatus" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tanggal Masuk</label>
-                        <input type="date" class="form-control" id="editTanggalMasuk" required />
+                        <label class="form-label fw-semibold">Tanggal Masuk</label>
+                        <input type="date" class="form-control rounded-1" id="editTanggalMasuk" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tanggal Keluar</label>
-                        <input type="date" class="form-control" id="editTanggalKeluar" />
+                        <label class="form-label fw-semibold">Tanggal Keluar</label>
+                        <input type="date" class="form-control rounded-1" id="editTanggalKeluar" />
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+
+                    <!-- Modal Footer -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn" data-bs-dismiss="modal"
+                            style="background-color: #c2c2f0; color: black; min-width: 100px;">Batal</button>
+                        <button type="submit" class="btn"
+                            style="background-color: #0d47a1; color: white; min-width: 100px;">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -131,9 +147,10 @@
     </div>
 </div>
 
+
 <!-- jQuery harus dimuat dulu -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<script src="{{ asset('js/siswa.js') }}"></script>
 
 <!-- AJAX Script -->
 <script >
@@ -319,6 +336,13 @@ $('#editStudentForm').off('submit').on('submit', function (e) {
 });
 </script>
 
+<style>
+    .modal-custom {
+    max-width: 850px; /* Ukuran sedang, bisa diatur sesuai kebutuhan */
+    width: 1000%;
+}
 
+
+</style>
 
 @endsection
